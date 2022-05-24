@@ -1,6 +1,4 @@
 variable "size" {
-  type    = string
-  default = "Standard_F4"
 }
 
 // To use custom image
@@ -28,7 +26,6 @@ variable "custom_image_resource_group_name" {
 // License Type to create FortiGate-VM
 // Provide the license type for FortiGate-VM Instances, either byol or payg.
 variable "license_type" {
-  default = "payg"
 }
 
 variable "publisher" {
@@ -89,23 +86,15 @@ variable "bootstrap-fgtvm" {
 
 // license file for the fgt
 variable "license" {
-  // Change to your own byol license file, license.lic
-  type    = string
-  default = "license.txt"
 }
 
 variable "t_name" {
-  type    = string
 }
 variable "t_username" {
-  type    = string
 }
 variable "t_expectedusethrough" {
-  type    = string
 }
 variable "t_vmstate" {
-  type    = string
 }
 variable "t_costcenter" {
-  type    = string
 }
