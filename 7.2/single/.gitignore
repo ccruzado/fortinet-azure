@@ -3,11 +3,12 @@
 # control as they are data points which are potentially sensitive and subject 
 # to change depending on the environment.
 #
+*.csv
 *.hcl
-*.tfvars
+*.info
+*.lic
 *.tfplan
 *.tfstate
 *.tfstate.backup
-*.csv
-*.info
+*.tfvars
 .terraform/
