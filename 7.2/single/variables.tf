@@ -1,9 +1,3 @@
-// Azure configuration
-variable subscription_id {}
-variable client_id {}
-variable client_secret {}
-variable tenant_id {}
-
 variable "size" {
   type    = string
   default = "Standard_F4"
@@ -74,21 +68,19 @@ variable "adminpassword" {
 
 variable "location" {
   type    = string
-  default = "westus2"
+  default = "eastus"
 }
 
 variable "vnetcidr" {
-  default = "10.1.0.0/16"
 }
-
 variable "publiccidr" {
-  default = "10.1.0.0/24"
 }
-
 variable "privatecidr" {
-  default = "10.1.1.0/24"
 }
-
+variable "ipfgtport1" {
+}
+variable "ipfgtport2" {
+}
 variable "bootstrap-fgtvm" {
   // Change to your own path
   type    = string
@@ -102,3 +94,18 @@ variable "license" {
   default = "license.txt"
 }
 
+variable "t_name" {
+  type    = string
+}
+variable "t_username" {
+  type    = string
+}
+variable "t_expectedusethrough" {
+  type    = string
+}
+variable "t_vmstate" {
+  type    = string
+}
+variable "t_costcenter" {
+  type    = string
+}

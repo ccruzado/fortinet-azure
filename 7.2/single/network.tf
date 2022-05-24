@@ -6,9 +6,9 @@ resource "azurerm_virtual_network" "fgtvnetwork" {
   location            = var.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
 
-  tags = {
-    environment = "Terraform Demo"
-  }
+  tags = merge(
+    local.common_tags
+  )
 }
 
 resource "azurerm_subnet" "publicsubnet" {
@@ -33,9 +33,9 @@ resource "azurerm_public_ip" "FGTPublicIp" {
   resource_group_name = azurerm_resource_group.myterraformgroup.name
   allocation_method   = "Static"
 
-  tags = {
-    environment = "Terraform Demo"
-  }
+  tags = merge(
+    local.common_tags
+  )
 }
 
 //  Network Security Group
@@ -56,9 +56,9 @@ resource "azurerm_network_security_group" "publicnetworknsg" {
     destination_address_prefix = "*"
   }
 
-  tags = {
-    environment = "Terraform Demo"
-  }
+  tags = merge(
+    local.common_tags
+  )
 }
 
 resource "azurerm_network_security_group" "privatenetworknsg" {
@@ -78,9 +78,9 @@ resource "azurerm_network_security_group" "privatenetworknsg" {
     destination_address_prefix = "*"
   }
 
-  tags = {
-    environment = "Terraform Demo"
-  }
+  tags = merge(
+    local.common_tags
+  )
 }
 
 resource "azurerm_network_security_rule" "outgoing_public" {
@@ -120,14 +120,15 @@ resource "azurerm_network_interface" "fgtport1" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = azurerm_subnet.publicsubnet.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.ipfgtport1
     primary                       = true
     public_ip_address_id          = azurerm_public_ip.FGTPublicIp.id
   }
 
-  tags = {
-    environment = "Terraform Demo"
-  }
+  tags = merge(
+    local.common_tags
+  )
 }
 
 resource "azurerm_network_interface" "fgtport2" {
@@ -139,12 +140,13 @@ resource "azurerm_network_interface" "fgtport2" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = azurerm_subnet.privatesubnet.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.ipfgtport2
   }
 
-  tags = {
-    environment = "Terraform Demo"
-  }
+  tags = merge(
+    local.common_tags
+  )
 }
 # Connect the security group to the network interfaces
 resource "azurerm_network_interface_security_group_association" "port1nsg" {
