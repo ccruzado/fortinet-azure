@@ -10,10 +10,10 @@ resource "azurerm_resource_group" "myterraformgroup" {
 }
 locals {
   common_tags = {
-    Name                = var.t_name
-    Username            = var.t_username
-    ExpectedUseThrough  = var.t_expectedusethrough
-    VMState             = var.t_vmstate
-    CostCenter          = var.t_costcenter
+    Name               = var.t_name
+    Username           = var.t_username
+    ExpectedUseThrough = var.t_expectedusethrough
+    VMState            = var.t_vmstate
+    CostCenter         = var.t_costcenter
   }
 }
