@@ -41,7 +41,7 @@ variable "fgtoffer" {
 // BYOL sku: fortinet_fg-vm
 // PAYG sku: fortinet_fg-vm_payg_2022
 variable "fgtsku" {
-  type = map
+  type = map(any)
   default = {
     byol = "fortinet_fg-vm"
     payg = "fortinet_fg-vm_payg_2022"
@@ -97,4 +97,14 @@ variable "t_expectedusethrough" {
 variable "t_vmstate" {
 }
 variable "t_costcenter" {
+}
+
+# Spoke01
+variable "spoke01vnetcidr" {
+}
+variable "spoke01publiccidr" {
+}
+variable "spoke01privatecidr" {
+}
+variable "ipserverspoke01" {
 }
