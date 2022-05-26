@@ -1,9 +1,9 @@
 #############################################################################################
 ### Create Virtual Network
 #############################################################################################
-resource "azurerm_virtual_network" "spoke01vnet" {
-  name                = "spoke01vnet"
-  address_space       = [var.spoke01vnetcidr]
+resource "azurerm_virtual_network" "spoke02vnet" {
+  name                = "spoke02vnet"
+  address_space       = [var.spoke02vnetcidr]
   location            = var.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
 
@@ -12,18 +12,18 @@ resource "azurerm_virtual_network" "spoke01vnet" {
   )
 }
 
-resource "azurerm_subnet" "spoke01privatesubnet" {
-  name                 = "spoke01privatesubnet"
+resource "azurerm_subnet" "spoke02privatesubnet" {
+  name                 = "spoke02privatesubnet"
   resource_group_name  = azurerm_resource_group.myterraformgroup.name
-  virtual_network_name = azurerm_virtual_network.spoke01vnet.name
-  address_prefixes     = [var.spoke01privatecidr]
+  virtual_network_name = azurerm_virtual_network.spoke02vnet.name
+  address_prefixes     = [var.spoke02privatecidr]
 }
 
 #############################################################################################
 ### Network Security Group
 #############################################################################################
-resource "azurerm_network_security_group" "spoke01SecurityGroupServer" {
-  name                = "spoke01SecurityGroupServer"
+resource "azurerm_network_security_group" "spoke02SecurityGroupServer" {
+  name                = "spoke02SecurityGroupServer"
   location            = var.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
 
@@ -47,16 +47,16 @@ resource "azurerm_network_security_group" "spoke01SecurityGroupServer" {
 #############################################################################################
 ### Server Interface
 #############################################################################################
-resource "azurerm_network_interface" "spoke01ServerPort" {
-  name                = "spoke01ServerPort"
+resource "azurerm_network_interface" "spoke02ServerPort" {
+  name                = "spoke02ServerPort"
   location            = var.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
 
   ip_configuration {
     name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.spoke01privatesubnet.id
+    subnet_id                     = azurerm_subnet.spoke02privatesubnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = var.ipserverspoke01
+    private_ip_address            = var.ipserverspoke02
     primary                       = true
   }
 
@@ -68,32 +68,32 @@ resource "azurerm_network_interface" "spoke01ServerPort" {
 #############################################################################################
 ### Connect the security group to the network interfaces
 #############################################################################################
-resource "azurerm_network_interface_security_group_association" "serverportspoke01" {
-  depends_on                = [azurerm_network_interface.spoke01ServerPort]
-  network_interface_id      = azurerm_network_interface.spoke01ServerPort.id
-  network_security_group_id = azurerm_network_security_group.spoke01SecurityGroupServer.id
+resource "azurerm_network_interface_security_group_association" "serverportspoke02" {
+  depends_on                = [azurerm_network_interface.spoke02ServerPort]
+  network_interface_id      = azurerm_network_interface.spoke02ServerPort.id
+  network_security_group_id = azurerm_network_security_group.spoke02SecurityGroupServer.id
 }
 
 #############################################################################################
-### VM SPOKE01
+### VM spoke02
 #############################################################################################
-resource "azurerm_linux_virtual_machine" "spoke01Server" {
-  name                = "spoke01Server"
+resource "azurerm_linux_virtual_machine" "spoke02Server" {
+  name                = "spoke02Server"
   resource_group_name = azurerm_resource_group.myterraformgroup.name
   location            = azurerm_resource_group.myterraformgroup.location
   size                = "Standard_B1s"
   admin_username      = "adminuser"
   network_interface_ids = [
-    azurerm_network_interface.spoke01ServerPort.id,
+    azurerm_network_interface.spoke02ServerPort.id,
   ]
 
   admin_ssh_key {
     username   = "adminuser"
-    public_key = tls_private_key.spoke01Ssh.public_key_openssh
+    public_key = tls_private_key.spoke02Ssh.public_key_openssh
   }
 
   os_disk {
-    name                  = "spoke01Disk"
+    name                  = "spoke02Disk"
     caching               = "ReadWrite"
     storage_account_type  = "Standard_LRS"
   }
@@ -109,31 +109,31 @@ resource "azurerm_linux_virtual_machine" "spoke01Server" {
 #############################################################################################
 ### VM KEY
 #############################################################################################
-resource "tls_private_key" "spoke01Ssh" {
+resource "tls_private_key" "spoke02Ssh" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
-resource "local_file" "spoke01SshKey" {
-  filename = "spoke01SshKey.pem"
-  content  = tls_private_key.spoke01Ssh.private_key_pem
+resource "local_file" "spoke02SshKey" {
+  filename = "spoke02SshKey.pem"
+  content  = tls_private_key.spoke02Ssh.private_key_pem
 }
 
 #############################################################################################
 ### PEERING
 #############################################################################################
-resource "azurerm_virtual_network_peering" "spoke01vnetpeering01" {
-  name                      = "hub-spoke01"
+resource "azurerm_virtual_network_peering" "spoke02vnetpeering01" {
+  name                      = "hub-spoke02"
   resource_group_name       = azurerm_resource_group.myterraformgroup.name
   virtual_network_name      = azurerm_virtual_network.fgtvnetwork.name
-  remote_virtual_network_id = azurerm_virtual_network.spoke01vnet.id
+  remote_virtual_network_id = azurerm_virtual_network.spoke02vnet.id
   allow_forwarded_traffic   = true
 }
 
-resource "azurerm_virtual_network_peering" "spoke01vnetpeering02" {
-  name                      = "spoke01-hub"
+resource "azurerm_virtual_network_peering" "spoke02vnetpeering02" {
+  name                      = "spoke02-hub"
   resource_group_name       = azurerm_resource_group.myterraformgroup.name
-  virtual_network_name      = azurerm_virtual_network.spoke01vnet.name
+  virtual_network_name      = azurerm_virtual_network.spoke02vnet.name
   remote_virtual_network_id = azurerm_virtual_network.fgtvnetwork.id
   allow_forwarded_traffic   = true
 }
@@ -141,34 +141,34 @@ resource "azurerm_virtual_network_peering" "spoke01vnetpeering02" {
 #############################################################################################
 ### VM ROUTES
 #############################################################################################
-resource "azurerm_route_table" "spoke01Internal" {
-  depends_on          = [azurerm_linux_virtual_machine.spoke01Server]
-  name                = "Spoke01RouteTablesPri"
+resource "azurerm_route_table" "spoke02Internal" {
+  depends_on          = [azurerm_linux_virtual_machine.spoke02Server]
+  name                = "Spoke01RouteTablesPub"
   location            = azurerm_resource_group.myterraformgroup.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
 }
 
-resource "azurerm_route" "spoke01Default" {
+resource "azurerm_route" "spoke02Default" {
   name                   = "default"
   resource_group_name    = azurerm_resource_group.myterraformgroup.name
-  route_table_name       = azurerm_route_table.spoke01Internal.name
+  route_table_name       = azurerm_route_table.spoke02Internal.name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
   next_hop_in_ip_address = azurerm_network_interface.fgtport2.private_ip_address
 }
 
-resource "azurerm_subnet_route_table_association" "spoke01InternalAssociate" {
-  depends_on     = [azurerm_route_table.spoke01Internal]
-  subnet_id      = azurerm_subnet.spoke01privatesubnet.id
-  route_table_id = azurerm_route_table.spoke01Internal.id
+resource "azurerm_subnet_route_table_association" "spoke02InternalAssociate" {
+  depends_on     = [azurerm_route_table.spoke02Internal]
+  subnet_id      = azurerm_subnet.spoke02privatesubnet.id
+  route_table_id = azurerm_route_table.spoke02Internal.id
 }
 
 #############################################################################################
 ### VARIABLES
 #############################################################################################
-variable "spoke01vnetcidr" {
+variable "spoke02vnetcidr" {
 }
-variable "spoke01privatecidr" {
+variable "spoke02privatecidr" {
 }
-variable "ipserverspoke01" {
+variable "ipserverspoke02" {
 }

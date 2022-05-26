@@ -98,13 +98,3 @@ variable "t_vmstate" {
 }
 variable "t_costcenter" {
 }
-
-# Spoke01
-variable "spoke01vnetcidr" {
-}
-variable "spoke01publiccidr" {
-}
-variable "spoke01privatecidr" {
-}
-variable "ipserverspoke01" {
-}
