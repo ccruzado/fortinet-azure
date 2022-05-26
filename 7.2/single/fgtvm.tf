@@ -26,7 +26,7 @@ resource "azurerm_virtual_machine" "customfgtvm" {
   }
 
   storage_os_disk {
-    name              = "osDisk"
+    name              = "fgtDisk"
     caching           = "ReadWrite"
     managed_disk_type = "Standard_LRS"
     create_option     = "FromImage"
