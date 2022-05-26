@@ -28,7 +28,7 @@ resource "azurerm_subnet" "privatesubnet" {
 
 // Allocated Public IP
 resource "azurerm_public_ip" "FGTPublicIp" {
-  name                = "FGTPublicIP"
+  name                = "fgtPublicIP"
   location            = var.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
   allocation_method   = "Static"
@@ -40,7 +40,7 @@ resource "azurerm_public_ip" "FGTPublicIp" {
 
 //  Network Security Group
 resource "azurerm_network_security_group" "publicnetworknsg" {
-  name                = "PublicNetworkSecurityGroup"
+  name                = "fgtSecurityGroupPublic"
   location            = var.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
 
@@ -62,7 +62,7 @@ resource "azurerm_network_security_group" "publicnetworknsg" {
 }
 
 resource "azurerm_network_security_group" "privatenetworknsg" {
-  name                = "PrivateNetworkSecurityGroup"
+  name                = "fgtSecurityGroupPrivate"
   location            = var.location
   resource_group_name = azurerm_resource_group.myterraformgroup.name
 
